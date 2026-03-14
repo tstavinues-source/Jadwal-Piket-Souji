@@ -20,6 +20,7 @@
             color: #f4f4f5;
             margin: 0;
             padding-bottom: 80px;
+            overflow-x: hidden;
         }
 
         .japanese-bg {
@@ -29,6 +30,33 @@
 
         .card-shadow {
             box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.7);
+        }
+
+        /* PERBAIKAN: Efek Shadow Penanda yang Sangat Terlihat (Luxury Hyper-Glow) */
+        .active-task-glow {
+            position: relative;
+            z-index: 50;
+            border: 2px solid rgba(255, 255, 255, 0.3) !important;
+            animation: hyperGlow 3s infinite alternate cubic-bezier(0.45, 0.05, 0.55, 0.95);
+        }
+
+        @keyframes hyperGlow {
+            0% { 
+                box-shadow: 0 0 15px #b91c1c, 0 0 30px #b91c1c; 
+                border-color: #b91c1c;
+            }
+            33% { 
+                box-shadow: 0 0 20px #7c3aed, 0 0 40px #7c3aed; 
+                border-color: #7c3aed;
+            }
+            66% { 
+                box-shadow: 0 0 20px #2563eb, 0 0 40px #2563eb; 
+                border-color: #2563eb;
+            }
+            100% { 
+                box-shadow: 0 0 15px #059669, 0 0 30px #059669; 
+                border-color: #059669;
+            }
         }
 
         .torii-line {
@@ -70,11 +98,109 @@
             pointer-events: none;
             font-weight: bold;
         }
+
+        .task-list li {
+            position: relative;
+            padding-left: 15px;
+            margin-bottom: 4px;
+        }
+        .task-list li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--osaka-red);
+            font-weight: bold;
+        }
+
+        /* Identity Popup */
+        #identity-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(15px);
+        }
+
+        .selector-card {
+            background: #1c1c1e;
+            border: 1px solid #450a0a;
+            padding: 2.5rem;
+            border-radius: 2rem;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(185, 28, 28, 0.4);
+        }
+
+        .name-btn {
+            display: block;
+            width: 100%;
+            padding: 1.2rem;
+            margin-top: 0.8rem;
+            background: #2a2a2d;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 1rem;
+            color: white;
+            font-weight: bold;
+            transition: all 0.4s;
+        }
+
+        .name-btn:hover {
+            transform: scale(1.05);
+            border-color: #b91c1c;
+            background: #3f0a0a;
+        }
+
+        /* Avatar Container */
+        #avatar-container {
+            position: fixed;
+            z-index: 10000;
+            pointer-events: auto;
+            touch-action: none;
+            transition: width 0.8s ease, top 0.8s ease, left 0.8s ease;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            cursor: grab;
+        }
+
+        #avatar-img {
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.3));
+        }
+
+        .ganbatte-text {
+            color: #fff;
+            background: #b91c1c;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+        }
     </style>
 </head>
 <body class="japanese-bg min-h-screen">
 
-    <!-- Header Mobile -->
+    <div id="identity-overlay">
+        <div class="selector-card fade-in">
+            <div class="mb-4 text-4xl">⛩️</div>
+            <h2 class="text-white font-bold text-2xl mb-2">Siapa Anda?</h2>
+            <p class="text-[10px] text-gray-500 mb-8 uppercase tracking-[0.3em]">Riverside Chiyoda 404</p>
+            <div id="name-selector-list" class="space-y-3"></div>
+        </div>
+    </div>
+
+    <div id="avatar-container">
+        <img id="avatar-img" src="" alt="User Avatar">
+        <div id="avatar-status" class="ganbatte-text mt-2 text-center">頑張って</div>
+    </div>
+
     <header class="pt-10 pb-6 px-6 text-center border-b border-white/5 relative overflow-hidden">
         <p class="text-[10px] tracking-[0.5em] text-red-500 uppercase font-bold mb-1">Dormitory System</p>
         <h1 style="font-family: 'Playfair Display', serif;" class="text-2xl font-bold tracking-tight leading-tight">
@@ -86,7 +212,6 @@
     </header>
 
     <main class="px-5 mt-8 max-w-md mx-auto">
-        <!-- Info Minggu -->
         <div class="mb-8 text-center">
             <div id="week-label" class="inline-block px-4 py-1 rounded-full border border-red-900/50 bg-red-950/20 text-red-400 text-[10px] font-bold uppercase mb-2">
                 Memuat Jadwal...
@@ -94,12 +219,8 @@
             <h2 id="week-dates" class="text-lg font-light text-gray-300 italic">Senin ke Senin</h2>
         </div>
 
-        <!-- Container Kartu -->
-        <div id="piket-container" class="space-y-6">
-            <!-- Kartu akan di-render di sini oleh JS -->
-        </div>
+        <div id="piket-container" class="space-y-6"></div>
 
-        <!-- Section Pesan Moral / Sarkas -->
         <div class="mt-12 sarcasm-card rounded-2xl p-6 card-shadow border-l-4 border-l-red-600 relative overflow-hidden">
             <div class="kanji-watermark">誠</div>
             <h4 class="text-red-500 font-bold text-xs uppercase tracking-widest mb-3 flex items-center gap-2">
@@ -107,157 +228,191 @@
             </h4>
             <div class="space-y-4">
                 <p class="text-sm text-gray-200 leading-relaxed italic">
-                    "Ingat, kebersihan area ini mencerminkan <span class="text-red-400 font-bold underline">kualitas didikan</span> di rumah masing-masing. Tidak ada yang melihat bukan berarti Anda bisa bertingkah seperti <span class="text-red-400">HEWAN</span>."
+                    "Ingat, kebersihan area ini mencerminkan <span class="text-red-400 font-bold underline">kualitas didikan</span> di rumah masing-masing. Tidak ada yang melihat bukan berarti Anda bisa bertingkah seperti <span class="text-red-400 font-bold uppercase">Hewan</span>."
                 </p>
                 <div class="p-3 bg-black/40 rounded-lg border border-red-900/30">
                     <p class="text-[11px] text-gray-400 leading-tight">
-                        Pastikan sampah yang dibuang <span class="text-white font-bold uppercase">bersih & kering</span>. 
-                        Kecuali sampah <span class="text-red-400 font-bold">Kanen</span> (mudah terbakar), dilarang meninggalkan sisa cairan atau sisa remahan makanan. 
+                        Pastikan sampah yang dibuang <span class="text-white font-bold uppercase text-[10px]">bersih & kering</span>. 
+                        Kecuali sampah <span class="text-red-400 font-bold">Kanen</span>, dilarang meninggalkan sisa cairan atau remahan makanan yang mengundang kecoa. 
                     </p>
                 </div>
-                <p class="text-[10px] text-gray-500 text-center font-bold uppercase tracking-tighter">
-                    Jangan jadi beban bagi orang lain hanya karena Anda malas menjadi manusia.
+                <p class="text-[10px] text-gray-400 text-center font-bold uppercase tracking-tighter italic">
+                    JANGAN JADI BEBAN BAGI ORANG LAIN HANYA KARENA ANDA MALAS MENJADI MANUSIA.
                 </p>
             </div>
         </div>
 
-        <!-- Deep Sarcasm Section -->
         <div class="mt-8 deep-sarcasm-card rounded-xl p-6 mb-10 shadow-inner">
             <div class="flex items-center gap-2 mb-3">
                 <div class="h-[1px] flex-grow bg-red-900"></div>
-                <span class="text-[10px] text-red-700 font-bold tracking-widest uppercase">Cermin Harga Diri</span>
+                <span class="text-[10px] text-red-700 font-bold tracking-widest uppercase text-[9px]">Cermin Harga Diri</span>
                 <div class="h-[1px] flex-grow bg-red-900"></div>
             </div>
-            <p class="text-xs text-gray-400 leading-relaxed text-center italic">
-                "Orang yang <span class="text-gray-200 font-bold">berakal</span> akan merenung saat melihat tempat kotor, sedangkan orang yang <span class="text-red-600 font-bold uppercase">SAKIT JIWA</span> hanya akan tersinggung saat ditegur. Jika Anda merasa tersinggung membaca ini, selamat, Anda tahu di kelompok mana Anda berada."
+            <p class="text-xs text-gray-300 leading-relaxed text-center italic">
+                "Hanya orang <span class="text-red-600 font-bold">SAKIT JIWA</span> yang nyaman hidup di tengah kotoran dan sampah. Jika Anda tersinggung membaca ini, syukurlah, berarti masih ada sedikit sisa kewarasan dalam otak Anda untuk menyadari betapa menjijikkannya rasa malas Anda."
             </p>
-            <p class="text-[10px] text-red-900 mt-4 text-center font-bold">
-                KEBERSIHAN ADALAH STANDARD MINIMUM MENJADI MANUSIA BERADAB. JANGAN TURUNKAN STANDARD ANDA KE LEVEL BINATANG.
+            <p class="text-[9px] text-red-900 mt-4 text-center font-bold uppercase tracking-widest">
+                Jangan biarkan harga diri Anda lebih rendah dari keset kaki. Bersihkan atau akui diri Anda bukan manusia beradab.
             </p>
         </div>
 
-        <!-- Footer Mobile -->
-        <div class="mt-12 text-center">
+        <div class="mt-12 text-center pb-8">
             <div class="w-10 h-10 border-2 border-red-900 mx-auto rounded-full flex items-center justify-center opacity-40">
                 <span class="text-red-500 text-[10px]">清</span>
             </div>
-            <p class="text-[10px] text-gray-600 mt-4 uppercase tracking-[0.2em]">Rotasi Otomatis: Setiap Senin 00:01</p>
+            <p class="text-[9px] text-gray-600 mt-4 uppercase tracking-[0.2em]">Rotasi Otomatis: Setiap Senin 00:01</p>
         </div>
     </main>
 
     <script>
         const persons = ["Amry Galih N", "Fikri Muzaki", "Gungun Gumilar", "Saleh Hudin"];
+        let currentUser = null;
         
         const areas = [
             {
-                name: "Area 1: Genkan",
+                name: "Area 1: Genkan & Lorong",
                 icon: "⛩️",
-                tasks: "Genkan, lantai & Nyuci Tempat Sampah",
-                checks: "Lap pel & Plastik Sampah."
+                tasks: ["Sapu Genkan & rapikan sepatu.", "Vacuum & Pel lorong.", "Cuci tempat sampah & pasang plastik.", "Lap gagang pintu."],
+                checks: "Stok Lap pel & Plastik."
             },
             {
-                name: "Area 2: Toilet",
+                name: "Area 2: Toilet, WC & Ofuro",
                 icon: "🚿",
-                tasks: "Kamar mandi, Toilet & Jendela Balkon",
-                checks: "Tissue toilet & Sabun pembersih."
+                tasks: ["Sikat kloset & area bawah.", "Sikat Ofuro & area mandi mandi.", "Bersihkan wastafel & cermin.", "Cuci keset & jendela balkon."],
+                checks: "Stok Tissue & Sabun."
             },
             {
-                name: "Area 3: Meja Makan",
+                name: "Area 3: Makan & Pendingin",
                 icon: "🍱",
-                tasks: "Kulkas & Meja Makan.",
-                checks: "Kebutuhan Rempah & Beras."
+                tasks: ["Lap meja makan & kursi.", "Bersihkan KESELURUHAN isi kulkas.", "Buang makanan basi/berjamur.", "Cuci keset area makan."],
+                checks: "Cek Rempah & Beras."
             },
             {
-                name: "Area 4: Dapur",
+                name: "Area 4: Dapur, Rice Cooker & Microwave",
                 icon: "🔪",
-                tasks: "Wastafel, Kompor, Alat masak & Ricecooker.",
-                checks: "Minyak, Saringan sampah dapur & Kitchen paper."
+                tasks: ["Lap microwave & rak (lap lembab).", "Bersihkan seng minyak di kompor.", "Saring jelantah (Pertengahan bulan).", "Cuci plat Rice Cooker.", "Sikat wastafel dapur."],
+                checks: "Stok Minyak & Saringan."
             }
         ];
 
-        // Start Date: 16 Maret 2026 jam 00:01 (Senin Pertama)
         const rotationStartDate = new Date('2026-03-16T00:01:00');
+
+        function getCurrentWeekIndex() {
+            const now = new Date();
+            const diffTime = now - rotationStartDate;
+            return diffTime > 0 ? Math.floor(diffTime / (1000 * 60 * 60 * 24 * 7)) : 0;
+        }
 
         function renderMobileSchedule() {
             const now = new Date();
-            
-            // Hitung selisih minggu
-            const diffTime = now - rotationStartDate;
-            let weekIndex = 0;
-            
-            if (diffTime > 0) {
-                // Berganti tepat setiap 7 hari (Senin jam 00:01)
-                weekIndex = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 7));
-            } else {
-                weekIndex = 0;
-            }
+            const weekIndex = getCurrentWeekIndex();
+            document.getElementById('date-now').innerText = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'short' });
 
-            // Update Tanggal Header
-            const dateFmt = { weekday: 'long', day: 'numeric', month: 'short' };
-            document.getElementById('date-now').innerText = now.toLocaleDateString('id-ID', dateFmt);
-
-            // Hitung Range Minggu Berjalan (Senin s/d Senin depan)
             const currentMonday = new Date(now);
-            const dayNum = now.getDay(); 
-            const diffToMonday = dayNum === 0 ? 6 : dayNum - 1; 
-            currentMonday.setDate(now.getDate() - diffToMonday);
-            currentMonday.setHours(0, 1, 0, 0);
-
+            currentMonday.setDate(now.getDate() - (now.getDay() === 0 ? 6 : now.getDay() - 1));
             const nextMonday = new Date(currentMonday);
             nextMonday.setDate(currentMonday.getDate() + 7);
             
-            document.getElementById('week-label').innerText = `Piket Minggu Ke-${weekIndex + 1}`;
-            document.getElementById('week-dates').innerText = `${currentMonday.toLocaleDateString('id-ID', {day:'numeric', month:'short'})} — ${nextMonday.toLocaleDateString('id-ID', {day:'numeric', month:'short'})} ${nextMonday.getFullYear()}`;
+            document.getElementById('week-label').innerText = `Minggu Ke-${weekIndex + 1}`;
+            document.getElementById('week-dates').innerText = `${currentMonday.toLocaleDateString('id-ID', {day:'numeric', month:'short'})} — ${nextMonday.toLocaleDateString('id-ID', {day:'numeric', month:'short'})}`;
 
             const container = document.getElementById('piket-container');
             container.innerHTML = '';
 
             areas.forEach((area, i) => {
-                // Rotasi Nama
-                const personIndex = (i + weekIndex) % persons.length;
-                const pic = persons[personIndex];
+                const pic = persons[(i + weekIndex) % persons.length];
+                const isActive = currentUser === pic;
 
                 const card = document.createElement('div');
-                card.className = "card-shadow bg-[#1c1c1e] rounded-2xl overflow-hidden border border-white/5 fade-in";
+                card.className = `bg-[#1c1c1e] rounded-2xl overflow-hidden border border-white/5 p-5 fade-in ${isActive ? 'active-task-glow' : 'card-shadow'}`;
                 card.style.animationDelay = `${i * 0.1}s`;
 
                 card.innerHTML = `
-                    <div class="p-5">
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="flex items-center gap-3">
-                                <span class="text-2xl opacity-80">${area.icon}</span>
-                                <h3 class="text-white font-bold tracking-wide text-sm">${area.name}</h3>
-                            </div>
-                            <div class="active-badge px-3 py-1 rounded-md shadow-lg shadow-red-900/20">
-                                <p class="text-[8px] text-red-100 font-bold uppercase leading-none mb-1">Petugas</p>
-                                <p class="text-xs text-white font-medium whitespace-nowrap">${pic}</p>
-                            </div>
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">${area.icon}</span>
+                            <h3 class="text-white font-bold text-xs uppercase">${area.name}</h3>
                         </div>
-                        
-                        <div class="space-y-3 mt-4 pt-4 border-t border-white/5">
-                            <div class="flex items-start gap-3">
-                                <div class="mt-1.5 w-1 h-1 rounded-full bg-red-600"></div>
-                                <div>
-                                    <p class="text-[9px] text-gray-500 uppercase font-bold tracking-tighter">Tugas Pembersihan</p>
-                                    <p class="text-xs text-gray-300 leading-snug">${area.tasks}</p>
-                                </div>
-                            </div>
-                            <div class="flex items-start gap-3">
-                                <div class="mt-1.5 w-1 h-1 rounded-full bg-gray-600"></div>
-                                <div>
-                                    <p class="text-[9px] text-gray-500 uppercase font-bold tracking-tighter">Cek Kebutuhan</p>
-                                    <p class="text-xs text-gray-400 italic leading-snug">${area.checks}</p>
-                                </div>
-                            </div>
+                        <div class="active-badge px-3 py-1 rounded-md">
+                            <p class="text-[10px] text-white font-medium">${pic}</p>
                         </div>
+                    </div>
+                    <ul class="task-list text-[11px] text-gray-300 leading-tight space-y-1 mb-4">
+                        ${area.tasks.map(t => `<li>${t}</li>`).join('')}
+                    </ul>
+                    <div class="pt-2 border-t border-white/5 flex items-center gap-2">
+                        <div class="w-1 h-1 rounded-full bg-red-600"></div>
+                        <p class="text-[10px] text-gray-500 italic">Cek: ${area.checks}</p>
                     </div>
                 `;
                 container.appendChild(card);
             });
         }
 
-        renderMobileSchedule();
-        setInterval(renderMobileSchedule, 60000); // Update setiap menit
+        function selectIdentity(name, id) {
+            currentUser = name;
+            document.getElementById('identity-overlay').style.display = 'none';
+            renderMobileSchedule();
+            showAvatar(id);
+        }
+
+        function showAvatar(id) {
+            const container = document.getElementById('avatar-container');
+            const img = document.getElementById('avatar-img');
+            const status = document.getElementById('avatar-status');
+            
+            img.src = `${id}.png`;
+            container.style.display = 'flex';
+            container.style.width = '180px';
+            container.style.left = '50%';
+            container.style.top = '50%';
+            container.style.transform = 'translate(-50%, -50%)';
+            
+            setTimeout(() => {
+                status.innerText = persons[id-1];
+                container.style.width = '85px';
+                container.style.left = 'calc(100% - 100px)';
+                container.style.top = '30px';
+                container.style.transform = 'translate(0, 0)';
+                setTimeout(() => initDraggable(container), 800);
+            }, 2000);
+        }
+
+        function initDraggable(el) {
+            let offsetLeft, offsetTop;
+            const onStart = (e) => {
+                const x = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+                const y = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+                const rect = el.getBoundingClientRect();
+                offsetLeft = x - rect.left; offsetTop = y - rect.top;
+                const onMove = (me) => {
+                    const mx = me.type === 'touchmove' ? me.touches[0].clientX : me.clientX;
+                    const my = me.type === 'touchmove' ? me.touches[0].clientY : me.clientY;
+                    el.style.left = `${mx - offsetLeft}px`; el.style.top = `${my - offsetTop}px`;
+                };
+                const onEnd = () => {
+                    document.removeEventListener('mousemove', onMove); document.removeEventListener('touchmove', onMove);
+                };
+                document.addEventListener('mousemove', onMove); document.addEventListener('touchmove', onMove);
+                document.addEventListener('mouseup', onEnd); document.addEventListener('touchend', onEnd);
+            };
+            el.addEventListener('mousedown', onStart); el.addEventListener('touchstart', onStart, { passive: false });
+        }
+
+        window.onload = () => {
+            initIdentitySelector();
+            renderMobileSchedule();
+        };
+
+        function initIdentitySelector() {
+            const list = document.getElementById('name-selector-list');
+            persons.forEach((name, i) => {
+                const btn = document.createElement('button');
+                btn.className = "name-btn"; btn.innerText = name;
+                btn.onclick = () => selectIdentity(name, i + 1);
+                list.appendChild(btn);
+            });
+        }
     </script>
 </body>
 </html>
