@@ -32,7 +32,7 @@
             box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.7);
         }
 
-        /* PERBAIKAN: Efek Shadow Penanda yang Sangat Terlihat (Luxury Hyper-Glow) */
+        /* Efek Shadow Penanda yang Sangat Terlihat (Luxury Hyper-Glow) */
         .active-task-glow {
             position: relative;
             z-index: 50;
@@ -174,6 +174,7 @@
             filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.3));
         }
 
+        /* Ganbatte text style */
         .ganbatte-text {
             color: #fff;
             background: #b91c1c;
@@ -182,6 +183,7 @@
             font-size: 14px;
             font-weight: bold;
             box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+            margin-top: 8px;
         }
     </style>
 </head>
@@ -198,7 +200,8 @@
 
     <div id="avatar-container">
         <img id="avatar-img" src="" alt="User Avatar">
-        <div id="avatar-status" class="ganbatte-text mt-2 text-center">頑張って</div>
+        <!-- Text status "Ganbatte" hanya muncul saat awal, lalu dihapus di JS -->
+        <div id="avatar-status" class="ganbatte-text text-center">頑張って</div>
     </div>
 
     <header class="pt-10 pb-6 px-6 text-center border-b border-white/5 relative overflow-hidden">
@@ -221,6 +224,7 @@
 
         <div id="piket-container" class="space-y-6"></div>
 
+        <!-- Section Pesan Moral -->
         <div class="mt-12 sarcasm-card rounded-2xl p-6 card-shadow border-l-4 border-l-red-600 relative overflow-hidden">
             <div class="kanji-watermark">誠</div>
             <h4 class="text-red-500 font-bold text-xs uppercase tracking-widest mb-3 flex items-center gap-2">
@@ -278,7 +282,7 @@
             {
                 name: "Area 2: Toilet, WC & Ofuro",
                 icon: "🚿",
-                tasks: ["Sikat kloset & area bawah.", "Sikat Ofuro & area mandi mandi.", "Bersihkan wastafel & cermin.", "Cuci keset & jendela balkon."],
+                tasks: ["Sikat kloset & area bawah.", "Sikat Ofuro & area mandi.", "Bersihkan wastafel & cermin.", "Cuci keset & jendela balkon."],
                 checks: "Stok Tissue & Sabun."
             },
             {
@@ -369,11 +373,15 @@
             container.style.transform = 'translate(-50%, -50%)';
             
             setTimeout(() => {
-                status.innerText = persons[id-1];
+                // Hapus teks status "Ganbatte" dan Nama setelah animasi awal
+                if (status) status.remove();
+                
+                // Perkecil dan pindah ke pojok
                 container.style.width = '85px';
                 container.style.left = 'calc(100% - 100px)';
                 container.style.top = '30px';
                 container.style.transform = 'translate(0, 0)';
+                
                 setTimeout(() => initDraggable(container), 800);
             }, 2000);
         }
@@ -385,34 +393,43 @@
                 const y = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
                 const rect = el.getBoundingClientRect();
                 offsetLeft = x - rect.left; offsetTop = y - rect.top;
+                
                 const onMove = (me) => {
                     const mx = me.type === 'touchmove' ? me.touches[0].clientX : me.clientX;
                     const my = me.type === 'touchmove' ? me.touches[0].clientY : me.clientY;
-                    el.style.left = `${mx - offsetLeft}px`; el.style.top = `${my - offsetTop}px`;
+                    el.style.left = `${mx - offsetLeft}px`; 
+                    el.style.top = `${my - offsetTop}px`;
                 };
+                
                 const onEnd = () => {
-                    document.removeEventListener('mousemove', onMove); document.removeEventListener('touchmove', onMove);
+                    document.removeEventListener('mousemove', onMove); 
+                    document.removeEventListener('touchmove', onMove);
                 };
-                document.addEventListener('mousemove', onMove); document.addEventListener('touchmove', onMove);
-                document.addEventListener('mouseup', onEnd); document.addEventListener('touchend', onEnd);
+                
+                document.addEventListener('mousemove', onMove); 
+                document.addEventListener('touchmove', onMove);
+                document.addEventListener('mouseup', onEnd); 
+                document.addEventListener('touchend', onEnd);
             };
-            el.addEventListener('mousedown', onStart); el.addEventListener('touchstart', onStart, { passive: false });
+            el.addEventListener('mousedown', onStart); 
+            el.addEventListener('touchstart', onStart, { passive: false });
+        }
+
+        function initIdentitySelector() {
+            const list = document.getElementById('name-selector-list');
+            persons.forEach((name, i) => {
+                const btn = document.createElement('button');
+                btn.className = "name-btn"; 
+                btn.innerText = name;
+                btn.onclick = () => selectIdentity(name, i + 1);
+                list.appendChild(btn);
+            });
         }
 
         window.onload = () => {
             initIdentitySelector();
             renderMobileSchedule();
         };
-
-        function initIdentitySelector() {
-            const list = document.getElementById('name-selector-list');
-            persons.forEach((name, i) => {
-                const btn = document.createElement('button');
-                btn.className = "name-btn"; btn.innerText = name;
-                btn.onclick = () => selectIdentity(name, i + 1);
-                list.appendChild(btn);
-            });
-        }
     </script>
 </body>
 </html>
