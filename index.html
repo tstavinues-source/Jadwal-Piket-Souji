@@ -19,7 +19,7 @@
             background-color: var(--osaka-dark);
             color: #f4f4f5;
             margin: 0;
-            padding-bottom: 60px;
+            padding-bottom: 80px;
         }
 
         .japanese-bg {
@@ -52,6 +52,12 @@
         .sarcasm-card {
             background: linear-gradient(180deg, #1c1c1e 0%, #450a0a 100%);
             border: 1px solid #7f1d1d;
+        }
+
+        .deep-sarcasm-card {
+            background: #000;
+            border: 1px dashed #450a0a;
+            position: relative;
         }
 
         .kanji-watermark {
@@ -115,6 +121,21 @@
             </div>
         </div>
 
+        <!-- Deep Sarcasm Section -->
+        <div class="mt-8 deep-sarcasm-card rounded-xl p-6 mb-10 shadow-inner">
+            <div class="flex items-center gap-2 mb-3">
+                <div class="h-[1px] flex-grow bg-red-900"></div>
+                <span class="text-[10px] text-red-700 font-bold tracking-widest uppercase">Cermin Harga Diri</span>
+                <div class="h-[1px] flex-grow bg-red-900"></div>
+            </div>
+            <p class="text-xs text-gray-400 leading-relaxed text-center italic">
+                "Orang yang <span class="text-gray-200 font-bold">berakal</span> akan merenung saat melihat tempat kotor, sedangkan orang yang <span class="text-red-600 font-bold uppercase">SAKIT JIWA</span> hanya akan tersinggung saat ditegur. Jika Anda merasa tersinggung membaca ini, selamat, Anda tahu di kelompok mana Anda berada."
+            </p>
+            <p class="text-[10px] text-red-900 mt-4 text-center font-bold">
+                KEBERSIHAN ADALAH STANDARD MINIMUM MENJADI MANUSIA BERADAB. JANGAN TURUNKAN STANDARD ANDA KE LEVEL BINATANG.
+            </p>
+        </div>
+
         <!-- Footer Mobile -->
         <div class="mt-12 text-center">
             <div class="w-10 h-10 border-2 border-red-900 mx-auto rounded-full flex items-center justify-center opacity-40">
@@ -154,35 +175,30 @@
             }
         ];
 
-        // Tanggal mulai awal (15 Maret 2026 adalah hari Minggu)
-        // Namun karena rotasi setiap Senin, kita hitung selisih dari Senin pertama yaitu 16 Maret 2026
+        // Start Date: 16 Maret 2026 jam 00:01 (Senin Pertama)
         const rotationStartDate = new Date('2026-03-16T00:01:00');
 
         function renderMobileSchedule() {
             const now = new Date();
             
-            // Hitung selisih minggu (7 hari penuh)
-            // Menggunakan Math.floor agar pergantian terjadi tepat saat melewati Senin jam 00:01
+            // Hitung selisih minggu
             const diffTime = now - rotationStartDate;
             let weekIndex = 0;
             
             if (diffTime > 0) {
+                // Berganti tepat setiap 7 hari (Senin jam 00:01)
                 weekIndex = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 7));
-                // Karena mulai 15 Maret (Minggu), maka Senin 16 Maret adalah awal Week 1 rotasi baru.
-                // Ditambah 1 karena array indeks 0 adalah area 1.
             } else {
-                // Untuk kasus sebelum 16 Maret 2026
                 weekIndex = 0;
             }
 
-            // Update Header Tanggal Hari Ini
+            // Update Tanggal Header
             const dateFmt = { weekday: 'long', day: 'numeric', month: 'short' };
             document.getElementById('date-now').innerText = now.toLocaleDateString('id-ID', dateFmt);
 
-            // Tentukan Range Minggu Ini (Senin ke Senin)
-            // Cari Senin terdekat sebelumnya
+            // Hitung Range Minggu Berjalan (Senin s/d Senin depan)
             const currentMonday = new Date(now);
-            const dayNum = now.getDay(); // 0 (Sun) to 6 (Sat)
+            const dayNum = now.getDay(); 
             const diffToMonday = dayNum === 0 ? 6 : dayNum - 1; 
             currentMonday.setDate(now.getDate() - diffToMonday);
             currentMonday.setHours(0, 1, 0, 0);
@@ -197,7 +213,7 @@
             container.innerHTML = '';
 
             areas.forEach((area, i) => {
-                // Algoritma rotasi: Nama orang berputar setiap minggu
+                // Rotasi Nama
                 const personIndex = (i + weekIndex) % persons.length;
                 const pic = persons[personIndex];
 
@@ -210,7 +226,7 @@
                         <div class="flex justify-between items-start mb-4">
                             <div class="flex items-center gap-3">
                                 <span class="text-2xl opacity-80">${area.icon}</span>
-                                <h3 class="text-white font-bold tracking-wide">${area.name}</h3>
+                                <h3 class="text-white font-bold tracking-wide text-sm">${area.name}</h3>
                             </div>
                             <div class="active-badge px-3 py-1 rounded-md shadow-lg shadow-red-900/20">
                                 <p class="text-[8px] text-red-100 font-bold uppercase leading-none mb-1">Petugas</p>
@@ -220,17 +236,17 @@
                         
                         <div class="space-y-3 mt-4 pt-4 border-t border-white/5">
                             <div class="flex items-start gap-3">
-                                <div class="mt-1 w-1.5 h-1.5 rounded-full bg-red-600"></div>
+                                <div class="mt-1.5 w-1 h-1 rounded-full bg-red-600"></div>
                                 <div>
-                                    <p class="text-[10px] text-gray-500 uppercase font-bold tracking-tighter">Tugas Pembersihan</p>
-                                    <p class="text-sm text-gray-300 leading-snug">${area.tasks}</p>
+                                    <p class="text-[9px] text-gray-500 uppercase font-bold tracking-tighter">Tugas Pembersihan</p>
+                                    <p class="text-xs text-gray-300 leading-snug">${area.tasks}</p>
                                 </div>
                             </div>
                             <div class="flex items-start gap-3">
-                                <div class="mt-1 w-1.5 h-1.5 rounded-full bg-gray-600"></div>
+                                <div class="mt-1.5 w-1 h-1 rounded-full bg-gray-600"></div>
                                 <div>
-                                    <p class="text-[10px] text-gray-500 uppercase font-bold tracking-tighter">Cek Kebutuhan</p>
-                                    <p class="text-sm text-gray-400 italic leading-snug">${area.checks}</p>
+                                    <p class="text-[9px] text-gray-500 uppercase font-bold tracking-tighter">Cek Kebutuhan</p>
+                                    <p class="text-xs text-gray-400 italic leading-snug">${area.checks}</p>
                                 </div>
                             </div>
                         </div>
@@ -241,8 +257,7 @@
         }
 
         renderMobileSchedule();
-        // Cek setiap menit untuk memastikan transisi Senin 00:01 akurat jika app tetap terbuka
-        setInterval(renderMobileSchedule, 60000);
+        setInterval(renderMobileSchedule, 60000); // Update setiap menit
     </script>
 </body>
 </html>
