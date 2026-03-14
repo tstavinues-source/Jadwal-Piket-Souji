@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riverside Chiyoda 404 Piket</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --osaka-dark: #0f0f10;
+            --osaka-card: #1c1c1e;
+            --osaka-red: #b91c1c;
+            --osaka-gold: #a3a3a3;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: var(--osaka-dark);
+            color: #f4f4f5;
+            margin: 0;
+            padding-bottom: 60px;
+        }
+
+        .japanese-bg {
+            background-image: linear-gradient(rgba(15, 15, 16, 0.95), rgba(15, 15, 16, 0.95)),
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 30c15 0 30-15 30-30H0c0 15 15 30 30 30z' fill='%23ffffff' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+        }
+
+        .card-shadow {
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.7);
+        }
+
+        .torii-line {
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--osaka-red), transparent);
+        }
+
+        .active-badge {
+            background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%);
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .sarcasm-card {
+            background: linear-gradient(180deg, #1c1c1e 0%, #450a0a 100%);
+            border: 1px solid #7f1d1d;
+        }
+
+        .kanji-watermark {
+            position: absolute;
+            right: -10px;
+            top: -10px;
+            font-size: 80px;
+            opacity: 0.05;
+            color: white;
+            pointer-events: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="japanese-bg min-h-screen">
+
+    <!-- Header Mobile -->
+    <header class="pt-10 pb-6 px-6 text-center border-b border-white/5 relative overflow-hidden">
+        <p class="text-[10px] tracking-[0.5em] text-red-500 uppercase font-bold mb-1">Dormitory System</p>
+        <h1 style="font-family: 'Playfair Display', serif;" class="text-2xl font-bold tracking-tight leading-tight">
+            リバーサイド千代田 <br>
+            <span class="text-red-600 text-3xl">404</span>
+        </h1>
+        <div class="torii-line mt-4 mb-2"></div>
+        <p id="date-now" class="text-xs text-gray-500 uppercase tracking-widest"></p>
+    </header>
+
+    <main class="px-5 mt-8 max-w-md mx-auto">
+        <!-- Info Minggu -->
+        <div class="mb-8 text-center">
+            <div id="week-label" class="inline-block px-4 py-1 rounded-full border border-red-900/50 bg-red-950/20 text-red-400 text-[10px] font-bold uppercase mb-2">
+                Memuat Jadwal...
+            </div>
+            <h2 id="week-dates" class="text-lg font-light text-gray-300 italic">Senin ke Senin</h2>
+        </div>
+
+        <!-- Container Kartu -->
+        <div id="piket-container" class="space-y-6">
+            <!-- Kartu akan di-render di sini oleh JS -->
+        </div>
+
+        <!-- Section Pesan Moral / Sarkas -->
+        <div class="mt-12 sarcasm-card rounded-2xl p-6 card-shadow border-l-4 border-l-red-600 relative overflow-hidden">
+            <div class="kanji-watermark">誠</div>
+            <h4 class="text-red-500 font-bold text-xs uppercase tracking-widest mb-3 flex items-center gap-2">
+                <span>⚠️</span> Catatan Untuk Nurani & Moral
+            </h4>
+            <div class="space-y-4">
+                <p class="text-sm text-gray-200 leading-relaxed italic">
+                    "Ingat, kebersihan area ini mencerminkan <span class="text-red-400 font-bold underline">kualitas didikan</span> di rumah masing-masing. Tidak ada yang melihat bukan berarti Anda bisa bertingkah seperti <span class="text-red-400">hewan</span>."
+                </p>
+                <div class="p-3 bg-black/40 rounded-lg border border-red-900/30">
+                    <p class="text-[11px] text-gray-400 leading-tight">
+                        Pastikan sampah yang dibuang <span class="text-white font-bold uppercase">bersih & kering</span>. 
+                        Kecuali sampah <span class="text-red-400 font-bold">Kanen</span> (mudah terbakar), dilarang meninggalkan sisa cairan atau sisa remahan makanan. 
+                    </p>
+                </div>
+                <p class="text-[10px] text-gray-500 text-center font-bold uppercase tracking-tighter">
+                    Jangan jadi beban bagi orang lain hanya karena Anda malas menjadi manusia.
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer Mobile -->
+        <div class="mt-12 text-center">
+            <div class="w-10 h-10 border-2 border-red-900 mx-auto rounded-full flex items-center justify-center opacity-40">
+                <span class="text-red-500 text-[10px]">清</span>
+            </div>
+            <p class="text-[10px] text-gray-600 mt-4 uppercase tracking-[0.2em]">Rotasi Otomatis: Setiap Senin 00:01</p>
+        </div>
+    </main>
+
+    <script>
+        const persons = ["Amry Galih N", "Fikri Muzaki", "Gungun Gumilar", "Saleh Hudin"];
+        
+        const areas = [
+            {
+                name: "Area 1: Genkan",
+                icon: "⛩️",
+                tasks: "Genkan, lantai & jendela.",
+                checks: "Lap pel, Plastik Sampah, & Tempat Sampah."
+            },
+            {
+                name: "Area 2: Toilet",
+                icon: "🚿",
+                tasks: "Kamar mandi & Toilet.",
+                checks: "Tissue toilet & Sabun pembersih."
+            },
+            {
+                name: "Area 3: Meja Makan",
+                icon: "🍱",
+                tasks: "Kulkas & Meja Makan.",
+                checks: "Kebutuhan Rempah & Beras."
+            },
+            {
+                name: "Area 4: Dapur",
+                icon: "🔪",
+                tasks: "Wastafel, Kompor, Alat masak & Ricecooker.",
+                checks: "Minyak, Saringan sampah, & Kitchen paper."
+            }
+        ];
+
+        // Tanggal mulai awal (15 Maret 2026 adalah hari Minggu)
+        // Namun karena rotasi setiap Senin, kita hitung selisih dari Senin pertama yaitu 16 Maret 2026
+        const rotationStartDate = new Date('2026-03-16T00:01:00');
+
+        function renderMobileSchedule() {
+            const now = new Date();
+            
+            // Hitung selisih minggu (7 hari penuh)
+            // Menggunakan Math.floor agar pergantian terjadi tepat saat melewati Senin jam 00:01
+            const diffTime = now - rotationStartDate;
+            let weekIndex = 0;
+            
+            if (diffTime > 0) {
+                weekIndex = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 7));
+                // Karena mulai 15 Maret (Minggu), maka Senin 16 Maret adalah awal Week 1 rotasi baru.
+                // Ditambah 1 karena array indeks 0 adalah area 1.
+            } else {
+                // Untuk kasus sebelum 16 Maret 2026
+                weekIndex = 0;
+            }
+
+            // Update Header Tanggal Hari Ini
+            const dateFmt = { weekday: 'long', day: 'numeric', month: 'short' };
+            document.getElementById('date-now').innerText = now.toLocaleDateString('id-ID', dateFmt);
+
+            // Tentukan Range Minggu Ini (Senin ke Senin)
+            // Cari Senin terdekat sebelumnya
+            const currentMonday = new Date(now);
+            const dayNum = now.getDay(); // 0 (Sun) to 6 (Sat)
+            const diffToMonday = dayNum === 0 ? 6 : dayNum - 1; 
+            currentMonday.setDate(now.getDate() - diffToMonday);
+            currentMonday.setHours(0, 1, 0, 0);
+
+            const nextMonday = new Date(currentMonday);
+            nextMonday.setDate(currentMonday.getDate() + 7);
+            
+            document.getElementById('week-label').innerText = `Piket Minggu Ke-${weekIndex + 1}`;
+            document.getElementById('week-dates').innerText = `${currentMonday.toLocaleDateString('id-ID', {day:'numeric', month:'short'})} — ${nextMonday.toLocaleDateString('id-ID', {day:'numeric', month:'short'})} ${nextMonday.getFullYear()}`;
+
+            const container = document.getElementById('piket-container');
+            container.innerHTML = '';
+
+            areas.forEach((area, i) => {
+                // Algoritma rotasi: Nama orang berputar setiap minggu
+                const personIndex = (i + weekIndex) % persons.length;
+                const pic = persons[personIndex];
+
+                const card = document.createElement('div');
+                card.className = "card-shadow bg-[#1c1c1e] rounded-2xl overflow-hidden border border-white/5 fade-in";
+                card.style.animationDelay = `${i * 0.1}s`;
+
+                card.innerHTML = `
+                    <div class="p-5">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl opacity-80">${area.icon}</span>
+                                <h3 class="text-white font-bold tracking-wide">${area.name}</h3>
+                            </div>
+                            <div class="active-badge px-3 py-1 rounded-md shadow-lg shadow-red-900/20">
+                                <p class="text-[8px] text-red-100 font-bold uppercase leading-none mb-1">Petugas</p>
+                                <p class="text-xs text-white font-medium whitespace-nowrap">${pic}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-3 mt-4 pt-4 border-t border-white/5">
+                            <div class="flex items-start gap-3">
+                                <div class="mt-1 w-1.5 h-1.5 rounded-full bg-red-600"></div>
+                                <div>
+                                    <p class="text-[10px] text-gray-500 uppercase font-bold tracking-tighter">Tugas Pembersihan</p>
+                                    <p class="text-sm text-gray-300 leading-snug">${area.tasks}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="mt-1 w-1.5 h-1.5 rounded-full bg-gray-600"></div>
+                                <div>
+                                    <p class="text-[10px] text-gray-500 uppercase font-bold tracking-tighter">Cek Kebutuhan</p>
+                                    <p class="text-sm text-gray-400 italic leading-snug">${area.checks}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        renderMobileSchedule();
+        // Cek setiap menit untuk memastikan transisi Senin 00:01 akurat jika app tetap terbuka
+        setInterval(renderMobileSchedule, 60000);
+    </script>
+</body>
+</html>
+
