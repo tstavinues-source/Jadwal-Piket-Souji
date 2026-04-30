@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -189,7 +190,7 @@
 
     <main class="px-5 mt-4 max-w-md mx-auto">
         
-        <!-- Cermin Harga Diri Pindah ke Atas -->
+        <!-- Cermin Harga Diri -->
         <div class="deep-sarcasm-card rounded-xl p-5 mb-8 shadow-inner border-double border-4 border-red-900/50">
             <div class="flex items-center gap-2 mb-3">
                 <div class="h-[1px] flex-grow bg-red-900"></div>
@@ -240,6 +241,21 @@
     </main>
 
     <script>
+        // ==========================================
+        // PENGATURAN ROTASI (GANTI DISINI)
+        // ==========================================
+        
+        // Pilih Mode: "AUTO" atau "MANUAL"
+        const ROTATION_MODE = "MANUAL"; 
+
+        // Jika MANUAL, tentukan urutan orang berdasarkan nomor area 1-4
+        // 1: Amry, 2: Fikri, 3: Gungun, 4: Saleh
+        // Contoh: [2, 3, 4, 1] artinya Fikri di Area 1, Gungun Area 2, dst.
+        const MANUAL_ORDER = [1, 2, 3, 4]; 
+
+        // ==========================================
+        // DATA DASAR
+        // ==========================================
         const persons = ["Amry Galih N", "Fikri Muzaki", "Gungun Gumilar", "Saleh Hudin"];
         let currentUser = null;
         
@@ -270,7 +286,6 @@
             }
         ];
 
-        // ROTASI: Disetel ke 9 Maret 2026 agar per hari ini sudah bergeser +1 index
         const rotationStartDate = new Date('2026-03-09T00:01:00');
 
         function getCurrentWeekIndex() {
@@ -290,18 +305,27 @@
             const diff = day === 0 ? 6 : day - 1; 
             currentMonday.setDate(now.getDate() - diff);
             currentMonday.setHours(0, 1, 0, 0);
-
             const nextMonday = new Date(currentMonday);
             nextMonday.setDate(currentMonday.getDate() + 7);
             
-            document.getElementById('week-label').innerText = `Minggu Ke-${weekIndex + 1}`;
+            document.getElementById('week-label').innerText = ROTATION_MODE === "AUTO" ? `Minggu Ke-${weekIndex + 1}` : "Mode Manual Aktif";
             document.getElementById('week-dates').innerText = `${currentMonday.toLocaleDateString('id-ID', {day:'numeric', month:'short'})} — ${nextMonday.toLocaleDateString('id-ID', {day:'numeric', month:'short'})}`;
 
             const container = document.getElementById('piket-container');
             container.innerHTML = '';
 
             areas.forEach((area, i) => {
-                const pic = persons[(i + weekIndex) % persons.length];
+                let pic;
+                if (ROTATION_MODE === "AUTO") {
+                    // Logika Otomatis (Bergeser tiap minggu)
+                    pic = persons[(i + weekIndex) % persons.length];
+                } else {
+                    // Logika Manual (Berdasarkan MANUAL_ORDER)
+                    // Ambil angka dari array (1-4), kurangi 1 untuk index array persons
+                    const personIndex = MANUAL_ORDER[i] - 1;
+                    pic = persons[personIndex];
+                }
+
                 const isActive = currentUser === pic;
 
                 const card = document.createElement('div');
@@ -347,18 +371,15 @@
             container.style.width = '180px'; container.style.left = '50%'; container.style.top = '40%';
             container.style.transform = 'translate(-50%, -50%)';
 
-            // Show Warning Popup
             warning.style.display = 'block';
             setTimeout(() => {
                 warning.style.opacity = '1';
                 warning.style.transform = 'translate(-50%, -50%) scale(1)';
             }, 50);
             
-            // Auto hide after 3.5 seconds and move avatar
             setTimeout(() => {
                 warning.style.opacity = '0';
                 setTimeout(() => warning.style.display = 'none', 500);
-
                 container.style.width = '85px'; container.style.left = 'calc(100% - 100px)'; container.style.top = '30px';
                 container.style.transform = 'translate(0, 0)';
                 setTimeout(() => initDraggable(container), 800);
@@ -405,3 +426,4 @@
 </body>
 </html>
 
+```
