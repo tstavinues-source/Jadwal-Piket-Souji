@@ -308,7 +308,7 @@
             const nextMonday = new Date(currentMonday);
             nextMonday.setDate(currentMonday.getDate() + 7);
             
-            document.getElementById('week-label').innerText = ROTATION_MODE === "AUTO" ? `Minggu Ke-${weekIndex + 1}` : "Mode Manual Aktif";
+            document.getElementById('week-label').innerText = ROTATION_MODE === "AUTO" ? `Minggu Ke-${weekIndex + 1}` : "Mode Aktif";
             document.getElementById('week-dates').innerText = `${currentMonday.toLocaleDateString('id-ID', {day:'numeric', month:'short'})} — ${nextMonday.toLocaleDateString('id-ID', {day:'numeric', month:'short'})}`;
 
             const container = document.getElementById('piket-container');
