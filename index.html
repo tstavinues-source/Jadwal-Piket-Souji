@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Status Ruang 404</title>
+    <title>Gerbang Kesadaran 404</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;900&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;900&family=Oswald:wght@700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #050505;
-            --accent: #3f0a0a;
+            --nuke-red: #cc0000;
+            --nuke-red-dark: #660000;
         }
 
         body {
@@ -22,117 +23,155 @@
             min-height: 100vh;
             margin: 0;
             padding: 20px;
+            overflow: hidden;
         }
 
         .main-container {
-            background: #0a0a0a;
+            background: #0d0d0d;
             border: 1px solid #1a1a1a;
-            padding: 3.5rem 2rem;
-            max-width: 450px;
+            padding: 3rem 2rem;
+            max-width: 500px;
             width: 100%;
             text-align: center;
             position: relative;
-            box-shadow: 0 0 80px rgba(0,0,0,1);
+            box-shadow: 0 0 100px rgba(0,0,0,1);
         }
 
-        .status-header {
-            color: #ef4444;
-            font-size: 11px;
-            letter-spacing: 0.6em;
-            text-transform: uppercase;
-            font-weight: 900;
-            margin-bottom: 1.5rem;
+        .nuke-button {
+            position: relative;
+            display: inline-block;
+            width: 120px;
+            height: 120px;
+            background: var(--nuke-red);
+            border-radius: 50%;
+            border: 8px solid #222;
+            box-shadow: 
+                0 15px 0 var(--nuke-red-dark),
+                0 15px 25px rgba(0,0,0,0.5),
+                inset 0 2px 5px rgba(255,255,255,0.3);
+            cursor: pointer;
+            transition: all 0.1s ease;
+            margin: 40px 0;
+            outline: none;
+        }
+
+        .nuke-button:active {
+            transform: translateY(12px);
+            box-shadow: 
+                0 3px 0 var(--nuke-red-dark),
+                0 3px 10px rgba(0,0,0,0.8),
+                inset 0 5px 10px rgba(0,0,0,0.5);
+        }
+
+        .nuke-label {
+            font-family: 'Oswald', sans-serif;
+            font-size: 10px;
+            letter-spacing: 2px;
+            color: #444;
+            margin-top: 10px;
             display: block;
+            text-transform: uppercase;
         }
 
-        .hero-text {
-            font-family: 'Playfair Display', serif;
-            font-size: 2.2rem;
-            line-height: 1.1;
-            color: #fafafa;
+        .glow-effect {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(204,0,0,0.15) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .warning-text {
+            font-size: 13px;
+            line-height: 1.8;
+            color: #52525b;
             margin-bottom: 2rem;
         }
 
-        .manifesto {
-            font-size: 14px;
-            line-height: 2;
-            text-align: justify;
-            color: #52525b;
-            margin: 2.5rem 0;
+        .header-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 2rem;
+            color: #fafafa;
+            letter-spacing: -1px;
+            line-height: 1.2;
+        }
+
+        .border-flashing {
+            border: 2px dashed #333;
             padding: 20px;
-            background: rgba(255,255,255,0.02);
-            border-radius: 4px;
+            margin-top: 20px;
+            animation: pulse-border 2s infinite;
         }
 
-        .highlight-red {
-            color: #991b1b;
-            font-weight: bold;
+        @keyframes pulse-border {
+            0%, 100% { border-color: #222; }
+            50% { border-color: #450a0a; }
         }
 
-        .stamp-area {
-            margin: 30px 0;
-            opacity: 0.5;
-        }
-
-        .badge {
-            border: 2px solid #27272a;
-            color: #27272a;
-            padding: 8px 16px;
-            font-size: 12px;
-            font-weight: bold;
-            display: inline-block;
-            transform: rotate(-3deg);
-        }
-
-        .footer-text {
-            font-size: 10px;
-            color: #3f3f46;
-            margin-top: 4rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .bg-kanji {
+        .kanji-bg {
             position: absolute;
-            top: 20px;
-            left: 20px;
-            font-size: 80px;
+            font-size: 300px;
             color: rgba(255,255,255,0.01);
+            z-index: -1;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             pointer-events: none;
         }
     </style>
 </head>
 <body>
 
-    <div class="bg-kanji">落</div>
+    <div class="kanji-bg">道</div> <!-- Kanji untuk "Jalan/Etika" -->
 
     <div class="main-container">
-        <span class="status-header">System Shutdown</span>
-        <h1 class="hero-text">Kebebasan Tanpa Syarat</h1>
-        
-        <div class="manifesto">
-            Tidak ada lagi jadwal. Tidak ada lagi daftar tugas. Tidak ada lagi paksaan untuk membersihkan ruang bersama. Karena aturan hanya berfungsi bagi yang memiliki kesadaran, maka <span class="highlight-red">Sistem Souji Resmi Dihapuskan</span>. 
-            <br><br>
-            Ruangan ini sekarang diserahkan sepenuhnya pada insting masing-masing. Jika debu, bau, dan kekacauan dianggap sebagai kenyamanan, maka silakan dinikmati. Standar hidup <span class="highlight-red">Kandang Babi</span> kini menjadi hak mutlak bagi siapa saja yang merasa malas adalah prioritas utama.
-        </div>
+        <header>
+            <span class="text-red-900 font-bold text-[10px] tracking-[0.5em] uppercase block mb-4">Saringan Akhir Karakter</span>
+            <h1 class="header-title">KONFIRMASI STATUS <br><span class="text-red-800">KEMANUSIAAN</span></h1>
+        </header>
 
-        <div class="stamp-area">
-            <div class="badge">
-                UNREGULATED ZONE
+        <div class="manifesto py-8">
+            <p class="warning-text italic">
+                "Ketiadaan aturan souji adalah surga bagi para pemalas, namun menjadi penghinaan bagi mereka yang berakal sehat. Sistem ini hanya disediakan bagi mereka yang masih memiliki rasa malu dan standar hidup layak."
+            </p>
+            
+            <div class="border-flashing">
+                <p class="text-white font-bold text-sm mb-2">PILIH SALAH SATU:</p>
+                <p class="text-[11px] text-zinc-500 leading-relaxed">
+                    Tetap diam jika merasa nyaman hidup di <span class="text-red-900">Kandang Babi</span>, atau tekan tombol di bawah jika merasa memiliki etika dan ingin membuktikan bahwa diri Anda <span class="text-white">BUKAN PARASIT</span>.
+                </p>
             </div>
         </div>
 
-        <div class="space-y-3 text-[11px] text-zinc-800 font-bold uppercase tracking-widest mt-10">
-            <p>Bebas Menjadi Kotor</p>
-            <p>Bebas Menjadi Parasit</p>
-            <p>Bebas Menjadi Beban</p>
+        <div class="relative inline-block">
+            <div class="glow-effect"></div>
+            <button class="nuke-button" onclick="launchSouji()">
+                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <span class="text-black/40 font-black text-[8px] leading-tight">HUMAN<br>ONLY</span>
+                </div>
+            </button>
+            <span class="nuke-label">Konfirmasi Etika Manusia</span>
         </div>
 
-        <footer class="footer-text">
-            Kesadaran diri tidak bisa dipaksakan.<br>
-            Selamat menikmati kekumuhan kolektif.
+        <footer class="mt-12">
+            <p class="text-[9px] text-zinc-800 tracking-widest uppercase">
+                Menekan tombol berarti setuju untuk bertanggung jawab.<br>
+                Abaikan jika ingin tetap menjadi beban.
+            </p>
         </footer>
     </div>
 
+    <script>
+        function launchSouji() {
+            // Efek suara atau delay bisa ditambahkan di sini
+            setTimeout(() => {
+                window.location.href = 'Souji.html';
+            }, 300);
+        }
+    </script>
 </body>
 </html>
