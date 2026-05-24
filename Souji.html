@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Riverside Chiyoda 404 Piket</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700;900&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
         :root {
             --osaka-dark: #0f0f10;
@@ -150,6 +150,29 @@
             90% { opacity: 1; }
             100% { transform: translateY(105vh) rotate(360deg); opacity: 0; }
         }
+
+        /* CSS STEMPEL SOUJI SELESAI MERAH MERONA KANJI */
+        .stempel-selesai {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            border: 4px solid #ef4444; /* Merah menyala */
+            color: #ef4444;
+            padding: 8px 24px;
+            font-family: 'Noto Sans JP', sans-serif;
+            font-weight: 900;
+            font-size: 36px; /* Ukuran lebih besar untuk kanji */
+            opacity: 0.85;
+            pointer-events: none;
+            z-index: 10;
+            letter-spacing: 4px;
+            background: rgba(239, 68, 68, 0.15);
+            border-radius: 12px;
+            white-space: nowrap;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4), inset 0 0 10px rgba(239, 68, 68, 0.2);
+        }
     </style>
 </head>
 <body class="japanese-bg min-h-screen">
@@ -279,6 +302,7 @@
 
         let syncedRotationMode = "AUTO"; 
         let syncedManualOrder = [0, 1, 2, 3]; 
+        let syncedSoujiLogs = {}; // State tambahan untuk menyimpan log souji terbaru
 
         // FX Animation State
         let fxIntervals = [];
@@ -386,37 +410,49 @@
                     return;
                 }
 
+                // Cek apakah pengguna terkait telah melaksanakan souji di siklus ini
+                let sudahSouji = false;
+                Object.values(syncedSoujiLogs).forEach(log => {
+                    if (log.user === pic && log.area === area.name && log.ts >= cycle.start && log.ts <= cycle.end) {
+                        sudahSouji = true;
+                    }
+                });
+
                 const card = document.createElement('div');
-                card.className = `bg-[#1c1c1e] rounded-2xl overflow-hidden border border-white/5 p-5 fade-in ${isUserTask ? 'active-task-glow' : 'card-shadow'}`;
+                // Menambahkan 'relative' dan menghilangkan glow jika tugas sudah diselesaikan
+                card.className = `bg-[#1c1c1e] rounded-2xl overflow-hidden border border-white/5 p-5 fade-in relative ${isUserTask && !sudahSouji ? 'active-task-glow' : 'card-shadow'}`;
                 card.style.animationDelay = `${i * 0.1}s`;
 
                 card.innerHTML = `
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="flex items-center gap-3">
-                            <span class="text-2xl">${area.icon}</span>
-                            <h3 class="text-white font-bold text-xs uppercase">${area.name}</h3>
+                    ${sudahSouji ? '<div class="stempel-selesai">掃除完了</div>' : ''}
+                    <div class="${sudahSouji ? 'opacity-40 pointer-events-none' : ''}">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl">${area.icon}</span>
+                                <h3 class="text-white font-bold text-xs uppercase">${area.name}</h3>
+                            </div>
+                            <div class="bg-gradient-to-r from-red-700 to-red-900 px-3 py-1 rounded-md">
+                                <p class="text-[10px] text-white font-medium">${pic}</p>
+                            </div>
                         </div>
-                        <div class="bg-gradient-to-r from-red-700 to-red-900 px-3 py-1 rounded-md">
-                            <p class="text-[10px] text-white font-medium">${pic}</p>
+                        <div class="space-y-2 mb-4">
+                            ${area.tasks.map((task, idx) => `
+                                <label class="check-container text-[11px] text-gray-300 leading-tight">
+                                    <input type="checkbox" ${isUserTask ? '' : 'disabled'} id="task-${i}-${idx}" ${sudahSouji ? 'checked' : ''}>
+                                    <span class="checkmark"></span>
+                                    <span>${task}</span>
+                                </label>
+                            `).join('')}
                         </div>
-                    </div>
-                    <div class="space-y-2 mb-4">
-                        ${area.tasks.map((task, idx) => `
-                            <label class="check-container text-[11px] text-gray-300 leading-tight">
-                                <input type="checkbox" ${isUserTask ? '' : 'disabled'} id="task-${i}-${idx}">
-                                <span class="checkmark"></span>
-                                <span>${task}</span>
-                            </label>
-                        `).join('')}
-                    </div>
-                    ${isUserTask ? `
-                        <button onclick="submitSouji(${i})" class="w-full bg-zinc-800 hover:bg-red-800 border border-zinc-700 text-white font-bold text-[10px] py-2 px-3 rounded-xl transition-all uppercase tracking-wider mb-3">
-                            ✅ Selesaikan Souji Hari Ini
-                        </button>
-                    ` : ''}
-                    <div class="pt-2 border-t border-white/5 flex items-center gap-2">
-                        <div class="w-1 h-1 rounded-full bg-red-600"></div>
-                        <p class="text-[10px] text-gray-500 italic">Cek berkala: ${area.checks}</p>
+                        ${(isUserTask && !sudahSouji) ? `
+                            <button onclick="submitSouji(${i})" class="w-full bg-zinc-800 hover:bg-red-800 border border-zinc-700 text-white font-bold text-[10px] py-2 px-3 rounded-xl transition-all uppercase tracking-wider mb-3">
+                                ✅ Selesaikan Souji Hari Ini
+                            </button>
+                        ` : ''}
+                        <div class="pt-2 border-t border-white/5 flex items-center gap-2">
+                            <div class="w-1 h-1 rounded-full bg-red-600"></div>
+                            <p class="text-[10px] text-gray-500 italic">Cek berkala: ${area.checks}</p>
+                        </div>
                     </div>
                 `;
                 container.appendChild(card);
@@ -619,6 +655,7 @@
                 const data = snap.val() || {};
                 syncedRotationMode = data.rotationMode || "AUTO";
                 syncedManualOrder = data.manualOrder || [0, 1, 2, 3];
+                syncedSoujiLogs = data.logs_souji || {}; // Menyimpan data ke state global
                 
                 updateAdabBoard(data.logs_souji || {});
                 renderLogs(data);
