@@ -157,12 +157,12 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(-15deg);
-            border: 4px solid #ef4444; /* Merah menyala */
+            border: 4px solid #ef4444;
             color: #ef4444;
             padding: 8px 24px;
             font-family: 'Noto Sans JP', sans-serif;
             font-weight: 900;
-            font-size: 36px; /* Ukuran lebih besar untuk kanji */
+            font-size: 36px;
             opacity: 0.85;
             pointer-events: none;
             z-index: 10;
@@ -275,7 +275,7 @@
             </div>
 
             <!-- Konten List Riwayat -->
-            <div id="log-content" class="space-y-2 max-h-48 overflow-y-auto pr-1 text-[11px]">
+            <div id="log-content" class="space-y-2 max-h-56 overflow-y-auto pr-1 text-[11px]">
                 <p class="text-gray-500 text-center py-4">Memuat riwayat...</p>
             </div>
         </div>
@@ -302,7 +302,7 @@
 
         let syncedRotationMode = "AUTO"; 
         let syncedManualOrder = [0, 1, 2, 3]; 
-        let syncedSoujiLogs = {}; // State tambahan untuk menyimpan log souji terbaru
+        let syncedSoujiLogs = {}; 
 
         // FX Animation State
         let fxIntervals = [];
@@ -419,7 +419,6 @@
                 });
 
                 const card = document.createElement('div');
-                // Menambahkan 'relative' dan menghilangkan glow jika tugas sudah diselesaikan
                 card.className = `bg-[#1c1c1e] rounded-2xl overflow-hidden border border-white/5 p-5 fade-in relative ${isUserTask && !sudahSouji ? 'active-task-glow' : 'card-shadow'}`;
                 card.style.animationDelay = `${i * 0.1}s`;
 
@@ -475,12 +474,12 @@
             
             document.getElementById('identity-overlay').style.display = 'none';
             
+            // Catat log manual login saat memilih nama
             db.ref(`${pathPiket}/logs_masuk`).push({
                 user: name,
                 ts: firebase.database.ServerValue.TIMESTAMP
             });
 
-            // Otomatis Sembunyikan tugas orang lain saat pertama kali memilih nama
             filterActiveUserOnly = true; 
             const btn = document.getElementById('toggle-filter-btn');
             if (btn) btn.innerText = "Tampilkan Semua Area 👁️";
@@ -499,7 +498,6 @@
         function checkPastDelinquencyAndShowWelcome(avatarId, name) {
             const currentCycleIndex = getCurrentWeekIndex();
             
-            // Siklus Ke-1 dilewatkan dari penagihan kelalaian
             if (currentCycleIndex === 0) {
                 showAvatarAndMotivation(avatarId, name);
                 return;
@@ -655,7 +653,7 @@
                 const data = snap.val() || {};
                 syncedRotationMode = data.rotationMode || "AUTO";
                 syncedManualOrder = data.manualOrder || [0, 1, 2, 3];
-                syncedSoujiLogs = data.logs_souji || {}; // Menyimpan data ke state global
+                syncedSoujiLogs = data.logs_souji || {}; 
                 
                 updateAdabBoard(data.logs_souji || {});
                 renderLogs(data);
@@ -697,9 +695,7 @@
             }
         }
 
-        // --- SISTEM VISUAL FX (LALAT & KECOA VS SAKURA) ---
         function startVisualFX(isDone) {
-            // Bersihkan FX lama
             fxIntervals.forEach(clearInterval);
             fxIntervals = [];
             const container = document.getElementById('fx-container');
@@ -814,7 +810,7 @@
                     const div = document.createElement('div');
                     
                     if (log.isLalai) {
-                        div.className = "p-2 bg-red-950/20 rounded-lg border-l-2 border-red-600 flex justify-between items-center border border-red-900/30";
+                        div.className = "p-2 bg-red-950/20 rounded-lg border-l-2 border-red-600 flex justify-between items-center border border-red-900/30 mb-2";
                         div.innerHTML = `
                             <div>
                                 <span class="text-red-400 font-bold">${log.user}</span> <span class="text-red-200">Melalaikan Souji</span> di Siklus Ke-${log.cycle + 1}
@@ -823,7 +819,7 @@
                             <span class="text-[9px] bg-red-900/50 text-red-300 px-1.5 py-0.5 rounded font-black uppercase">Alpa ❌</span>
                         `;
                     } else {
-                        div.className = "p-2 bg-zinc-900/50 rounded-lg border-l-2 border-emerald-500 flex justify-between items-center";
+                        div.className = "p-2 bg-zinc-900/50 rounded-lg border-l-2 border-emerald-500 flex justify-between items-center mb-2";
                         div.innerHTML = `
                             <div>
                                 <span class="text-white font-bold">${log.user}</span> membersihkan <span class="text-zinc-400">${log.area}</span>
@@ -835,18 +831,51 @@
                     container.appendChild(div);
                 });
             } else {
-                const logs = data.logs_masuk ? Object.values(data.logs_masuk).sort((a,b) => b.ts - a.ts) : [];
+                // LOGIKA PENGELOMPOKAN RIWAYAT MASUK
+                const logs = data.logs_masuk ? Object.values(data.logs_masuk) : [];
                 if(logs.length === 0) {
                     container.innerHTML = `<p class="text-gray-600 text-center py-4">Belum ada riwayat masuk.</p>`;
                     return;
                 }
+
+                // Kelompokkan berdasarkan (Tanggal + User)
+                const grouped = {};
                 logs.forEach(log => {
-                    const timeStr = new Date(log.ts).toLocaleDateString('id-ID', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+                    const d = new Date(log.ts);
+                    const dateStr = d.toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'});
+                    const key = `${dateStr}_${log.user}`;
+                    if (!grouped[key]) {
+                        grouped[key] = { user: log.user, dateStr: dateStr, times: [], latestTs: log.ts };
+                    }
+                    grouped[key].times.push(log.ts);
+                    if (log.ts > grouped[key].latestTs) grouped[key].latestTs = log.ts;
+                });
+
+                // Urutkan grup berdasarkan jam terakhir masuk
+                const sortedGroups = Object.values(grouped).sort((a,b) => b.latestTs - a.latestTs);
+
+                sortedGroups.forEach((group, index) => {
+                    const groupId = `login-group-${index}`;
+                    group.times.sort((a,b) => b - a); // Urutkan jam dari terbaru ke terlama
+                    
                     const div = document.createElement('div');
-                    div.className = "p-2 bg-zinc-900/50 rounded-lg border-l-2 border-indigo-500";
+                    div.className = "p-2 bg-zinc-900/50 rounded-lg border-l-2 border-indigo-500 mb-2 transition-all";
+                    
+                    let timesHtml = group.times.map(ts => {
+                        return `<p>• Pukul ${new Date(ts).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})}</p>`;
+                    }).join('');
+
                     div.innerHTML = `
-                        <span class="text-white font-bold">${log.user}</span> membuka sistem piket.
-                        <p class="text-[9px] text-gray-500">${timeStr}</p>
+                        <div class="flex justify-between items-center cursor-pointer" onclick="document.getElementById('${groupId}').classList.toggle('hidden')">
+                            <div>
+                                <span class="text-white font-bold">${group.user}</span> hadir
+                                <p class="text-[9px] text-gray-500">${group.dateStr} <span class="text-indigo-400 font-bold ml-1">(${group.times.length}x Buka Web)</span></p>
+                            </div>
+                            <span class="text-[10px] bg-indigo-900/30 border border-indigo-500/30 text-indigo-300 px-2 py-1 rounded">Lihat 👁️</span>
+                        </div>
+                        <div id="${groupId}" class="hidden mt-2 pt-2 border-t border-white/5 text-[10px] text-gray-400 space-y-1 pl-2 pb-1">
+                            ${timesHtml}
+                        </div>
                     `;
                     container.appendChild(div);
                 });
@@ -876,10 +905,19 @@
 
         function initIdentitySelector() {
             const list = document.getElementById('name-selector-list');
-            persons.forEach((name, i) => {
+            
+            // Pemetaan manual: Nama -> ID gambar
+            const avatarMapping = {
+                "Gungun Gumilar": 1, 
+                "Fikri Muzaki": 2,
+                "Amry Galih N": 3,
+                "Saleh Hudin": 4
+            };
+
+            persons.forEach((name) => {
                 const btn = document.createElement('button');
                 btn.className = "name-btn"; btn.innerText = name;
-                btn.onclick = () => selectIdentity(name, i + 1);
+                btn.onclick = () => selectIdentity(name, avatarMapping[name]);
                 list.appendChild(btn);
             });
         }
@@ -895,18 +933,26 @@
                 }
             });
 
+            // Cek sesi login memori
             const savedUser = localStorage.getItem('piket_user');
             const savedAvatarId = localStorage.getItem('piket_avatar_id');
+            
             if(savedUser && savedAvatarId) {
                 currentUser = savedUser;
                 document.getElementById('identity-overlay').style.display = 'none';
-                
-                // Menyembunyikan otomatis tugas orang lain di awal masuk
                 filterActiveUserOnly = true;
                 
+                // CATAT AUTO-LOGIN
+                db.ref(`${pathPiket}/logs_masuk`).push({
+                    user: currentUser,
+                    ts: firebase.database.ServerValue.TIMESTAMP
+                });
+
                 renderMobileSchedule();
-                listenToFirebaseData();
+                // Firebase callback akan handle sisanya
+                checkPastDelinquencyAndShowWelcome(savedAvatarId, savedUser);
             } else {
+                document.getElementById('identity-overlay').style.display = 'flex';
                 renderMobileSchedule();
             }
             
